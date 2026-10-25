@@ -560,22 +560,22 @@ def numrun(myinput: str, stream_log: bool=True):
     # Lambdifying matrices
     logger.info("Lambdify matrices (starts at {:.3f} s)".format(tm.time() - start_time))
     Zfunc = sym.lambdify((C,), zfunc, "mpmath", dummify=False)
-    L0func = sym.lambdify((e, W), Array(L0mat), "mpmath", dummify=False)
-    Tdfunc = sym.lambdify((W,), Array(Tdiag), "mpmath", dummify=False)
-    KLfunc = sym.lambdify((e, W), Array(Klambda), "mpmath", dummify=False)
+    L0func = sym.lambdify((e, W), Array(L0mat).tolist(), "mpmath", dummify=False)
+    Tdfunc = sym.lambdify((W,), Array(Tdiag).tolist(), "mpmath", dummify=False)
+    KLfunc = sym.lambdify((e, W), Array(Klambda).tolist(), "mpmath", dummify=False)
     Dfunc = {} # empty dictionary
     for a in dissocoeff:
         Dfunc[a] = sym.lambdify((W,), dissocoeff[a], "mpmath", dummify=False)
     if len(Tsparse) > 0:
-        Tcfunc = sym.lambdify((W,), Array(Tsparse), "mpmath", dummify=False)
+        Tcfunc = sym.lambdify((W,), Array(Tsparse).tolist(), "mpmath", dummify=False)
     else:
         Tcfunc = sym.lambdify((W,), [], "mpmath", dummify=False)
     for k1 in maxkira:
         for k2 in maxkira[k1][2]:
             for k3 in maxkira[k1][2][k2]:
-                maxkira[k1][2][k2][k3] = sym.lambdify((e,), Array(maxkira[k1][2][k2][k3]), "mpmath", dummify=False)
+                maxkira[k1][2][k2][k3] = sym.lambdify((e,), Array(maxkira[k1][2][k2][k3]).tolist(), "mpmath", dummify=False)
     if len(SiteCorr) > 0:
-        SiteCorrFunc = [sym.lambdify((e, W), Array(x), "mpmath", dummify=False) for x in SiteCorr] #dmap, dlambda, dissocontrib
+        SiteCorrFunc = [sym.lambdify((e, W), Array(x).tolist(), "mpmath", dummify=False) for x in SiteCorr] #dmap, dlambda, dissocontrib
     else:
         SiteCorrFunc = []
 
@@ -730,12 +730,12 @@ def numrun(myinput: str, stream_log: bool=True):
             logger.info("!! Removed {} kinetic equations because some configuration prefactors were set to zero".format(len(eqtoremove)))
             # Re-Lambdifying matrices because some configurations were removed
             logger.info("Re-Lambdify matrices (starts at {:.3f} s)".format(tm.time() - start_time))
-            KLfunc = sym.lambdify((e, W), Array(Klambda2), "mpmath", dummify=False)
-            Tdfunc = sym.lambdify((W,), Array(Tdiag2), "mpmath", dummify=False)
+            KLfunc = sym.lambdify((e, W), Array(Klambda2).tolist(), "mpmath", dummify=False)
+            Tdfunc = sym.lambdify((W,), Array(Tdiag2).tolist(), "mpmath", dummify=False)
             if len(SiteCorr) > 0:
-                SiteCorrFunc[0] = sym.lambdify((e,W), Array(Dmap), "mpmath", dummify=False)
+                SiteCorrFunc[0] = sym.lambdify((e,W), Array(Dmap).tolist(), "mpmath", dummify=False)
             if len(Tsparse) > 0:
-                Tcfunc = sym.lambdify((W,), Array(Tsparse2), "mpmath", dummify=False)
+                Tcfunc = sym.lambdify((W,), Array(Tsparse2).tolist(), "mpmath", dummify=False)
             else:
                 Tcfunc = sym.lambdify((W,), [], "mpmath", dummify=False)
             # Removing kinetic interactions from maxkira as well
@@ -777,12 +777,12 @@ def numrun(myinput: str, stream_log: bool=True):
                     dTnum += dTnum.transpose()
                     dTnum += sparse.csc_matrix((np.array(Tdfunc(Wnum), dtype=float)[:, 0], (list(range(Ninter)), list(range(Ninter)))), shape=(Ninter, Ninter), dtype=float)
                     derT.append(dTnum)
-                    derL0.append([np.matrix(L0func(Smax, Wnum)[d]) for d in range(ndir)])
-                    derKL.append([np.matrix(KLfunc(Smax, Wnum)[d]) for d in range(ndir)])
+                    derL0.append([np.matrix(L0func(Smax, Wnum)[d], dtype=float) for d in range(ndir)])
+                    derKL.append([np.matrix(KLfunc(Smax, Wnum)[d], dtype=float) for d in range(ndir)])
                     if len(SiteCorrFunc) != 0:
-                        derSiteCorrFunc.append([np.matrix(SiteCorrFunc[0](Smax, Wnum)),
-                                                [np.matrix(SiteCorrFunc[1](Smax, Wnum)[d]) for d in range(ndir)],
-                                                np.matrix(SiteCorrFunc[2](Smax, Wnum))])
+                        derSiteCorrFunc.append([np.matrix(SiteCorrFunc[0](Smax, Wnum), dtype=float),
+                                                [np.matrix(SiteCorrFunc[1](Smax, Wnum)[d], dtype=float) for d in range(ndir)],
+                                                np.matrix(SiteCorrFunc[2](Smax, Wnum), dtype=float)])
             del dTnum
 
         # Assigning values as a function of strain and temperature for jump frequencies
