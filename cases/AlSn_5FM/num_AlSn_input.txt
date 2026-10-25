@@ -1,0 +1,11 @@
+Numerical input: Sn-vacancy pair in fcc Al. Jump frequencies and binding energies
+are written into CALC/jump_frequencies.txt and CALC/configurations.txt by make_5fm.py.
+
+& TEMPERATURES 500 900 50 # K
+& LATTPARAM 4.05 # Angstrom
+& KRAACTIVATION # required keyword; not used, every frequency is given explicitly
+vacancy_jump 0.581
+solute_jump 0.45
+& OUTOPTIONS DR # also print drag ratios L_vs/L_ss
+& KIRALOOP # convergence study vs kinetic range
+& OUTPUT AlSn_5FM
