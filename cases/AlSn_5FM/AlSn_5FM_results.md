@@ -78,6 +78,8 @@ and migration.
 | 750 | 8.54e-11 | 7.35e-11 | 0.861 | 0.20 |
 | 800 | 1.50e-10 | 1.33e-10 | 0.889 | 0.16 |
 
+![Vacancy diffusivity in pure Al and Al–0.04 at.% Sn](AlSn_5FM_Dv.png)
+
 Bound / free is C_Sn·(Z − Z0). Trapping on Sn cuts D_v to 5.6% of the pure-Al value at 300 K and 89% at
 800 K. ln D_v is curved, so read values from the table; a straight fit over 300–800 K gives D0 = 0.0431
 cm²/s and Q = 0.700 eV (pure Al: 0.00689 cm²/s, 0.581 eV). D_v changes by under 0.1% between kinetic
@@ -169,6 +171,7 @@ Ef nor E_shift affects Lij ratios or f₂.
 | `run.sh` | Runs analytical stage → `make_5fm.py` → numerical stage (500–900 K, then 300–800 K) |
 | `CALC_kira6/` | Same model run to kinetic range 6 (`& KINETICRANGE 6 1`), for the convergence check |
 | `plot_results.py` | Makes `AlSn_5FM_results.png` from `CALC/` and `CALC_kira6/` |
+| `plot_dv.py` | Makes `AlSn_5FM_Dv.png` (D_v in pure Al and Al–0.04 at.% Sn) from `CALC/AlSn_5FM_lowT_total.dat` |
 | `total_lij.py` | Total Lij, D_Sn and D_Al from the pair coefficients (`python3 total_lij.py [CALC/] [--csn X] [--ef E] [--shift]`) |
 | `num_AlSn_lowT_input.txt` | Numerical input for 300–800 K (output `AlSn_5FM_lowT`), used for the Al–0.04 at.% Sn vacancy diffusivity |
 
