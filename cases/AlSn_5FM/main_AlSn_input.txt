@@ -5,7 +5,7 @@ Lattice vectors are in units of the cubic lattice parameter a (given in the nume
 0.5 0.5 0.0
 0.5 0.0 0.5
 0.0 0.5 0.5
-& KINETICRANGE 4 # cluster kept until the vacancy-solute distance exceeds 4a (drag ratio converged to <1%)
+& KINETICRANGE 4 1 # kinetic range 4a; thermodynamic range 1a (only the 1NN pair interacts, as in the five-frequency model)
 & KIRALOOP # store equations so kineclue_num can test convergence vs kinetic range
 & UNIQUEPOS 1
 s 0 0 0
