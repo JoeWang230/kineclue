@@ -1,4 +1,4 @@
 1) Configuration class; 2) Entropy prefactor (no units); 3) Binding energy (eV, >0 means attraction);4) Dissociated; 5) Number of symmetry equivalents; 6) Position of each defect in orthonormal coordinates
 0      -1.000  0.000  d0_1|1_0       1042 [+0.00 +0.00 +0.00] [-3.00 -3.00 +0.00] 
-1       1.1065 0.2361  -             12 [+0.00 +0.00 +0.00] [-0.50 -0.50 +0.00] 
+1      1.106510322292 0.236070000000  -             12 [+0.00 +0.00 +0.00] [-0.50 -0.50 +0.00] 
 2      -1.000  0.000     -              6 [+0.00 +0.00 +0.00] [+0.00 -1.00 +0.00] 

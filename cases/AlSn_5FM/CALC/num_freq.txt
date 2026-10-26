@@ -1,8 +1,8 @@
 1) Jump frequency number; 2) Jump prefactor (no units) 3) Saddle-point energy (eV); 4) Configuration class 1; 5) Configuration class 2; 6) Jump mechanism name; 7) Number of symmetry equivalent jumps
-0       4.30660000000000e+00   0.36460000000000   1     0      vacancy_jump  12    
-1       4.53950000000000e+00   0.56440000000000   1     1      vacancy_jump  24    
-2       4.30660000000000e+00   0.36460000000000   1     2      vacancy_jump  24    
-3       2.24960000000000e+00   0.06240000000000   1     1      solute_jump   6     
-4       4.22420000000000e+00   0.58140000000000   0     0      vacancy_jump  12    
-5       4.22420000000000e+00   0.58140000000000   2     0      vacancy_jump  24    
-6       4.22420000000000e+00   0.58140000000000   0     0      vacancy_jump  12    
+0       4.30656471035000e+00   0.36456000000000   1     0      vacancy_jump  12    
+1       4.53950491271300e+00   0.56439000000000   1     1      vacancy_jump  24    
+2       4.30656471035000e+00   0.36456000000000   1     2      vacancy_jump  24    
+3       2.24958354370200e+00   0.06241000000000   1     1      solute_jump   6     
+4       4.22424298132800e+00   0.58143000000000   0     0      vacancy_jump  12    
+5       4.22424298132800e+00   0.58143000000000   2     0      vacancy_jump  24    
+6       4.22424298132800e+00   0.58143000000000   0     0      vacancy_jump  12    

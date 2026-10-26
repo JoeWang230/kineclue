@@ -16,11 +16,11 @@ EM = {         # migration barriers measured from the initial configuration
     'w4': 0.36456,  # association, reverse of w3
 }
 NU = {         # attempt frequencies
-    'w0': 4.22424,
-    'w1': 4.10254,
-    'w2': 2.03304,
-    'w3': 3.89202,
-    'w4': 4.30656,
+    'w0': 4.2242429813276337,
+    'w1': 4.1025418572786059,
+    'w2': 2.0330434324753228,
+    'w3': 3.8920239816921365,
+    'w4': 4.3065647103498712,
 }
 EB = EM['w3'] - EM['w4']  # Sn-vacancy 1NN binding energy (0.236 eV); zero beyond 1NN
 # KineCluE divides a jump prefactor by the entropy prefactor of the starting configuration.
@@ -44,7 +44,7 @@ for line in lines[1:]:
     dist = np.linalg.norm(np.array(pos[3:]) - np.array(pos[:3]))
     if abs(dist - nn1) < 1e-6 and f[3] == '-':
         nn1_class = f[0]
-        line = '{:6s} {:7.4f} {:6.4f}'.format(f[0], S1NN, EB) + line.split(None, 3)[3].join(['  ', ''])
+        line = '{:6s} {:.12f} {:.12f}'.format(f[0], S1NN, EB) + line.split(None, 3)[3].join(['  ', ''])
     rows.append(line)
 assert nn1_class is not None, '1NN configuration not found'
 open(calc + 'configurations.txt', 'w').write('\n'.join([header] + rows) + '\n')
@@ -66,7 +66,7 @@ for line in lines[1:]:
     else:
         w, esp = 'w0', EM['w0']
     count[w] = count.get(w, 0) + 1
-    rows.append('{:6s} {:7.4f} {:7.4f}   {:5s} {:5s} {:14s} {:>4s}   # {}'.format(num, JUMP_NU[w], esp, c1, c2, mech, mult, w))
+    rows.append('{:6s} {:.12f} {:.12f}   {:5s} {:5s} {:14s} {:>4s}   # {}'.format(num, JUMP_NU[w], esp, c1, c2, mech, mult, w))
 open(calc + 'jump_frequencies.txt', 'w').write('\n'.join([header] + rows) + '\n')
 
 print('1NN configuration class:', nn1_class)

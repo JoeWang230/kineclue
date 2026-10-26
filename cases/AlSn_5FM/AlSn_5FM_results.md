@@ -12,10 +12,10 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 |---|---|---|
 | 500 | 0.843 | 0.0018 |
 | 550 | 0.760 | 0.0035 |
-| 600 | 0.662 | 0.0060 |
+| 600 | 0.663 | 0.0060 |
 | 650 | 0.555 | 0.0097 |
-| 700 | 0.442 | 0.0147 |
-| 750 | 0.328 | 0.0212 |
+| 700 | 0.443 | 0.0147 |
+| 750 | 0.329 | 0.0212 |
 | 800 | 0.217 | 0.0291 |
 | 850 | 0.109 | 0.0387 |
 | 900 | 0.007 | 0.0498 |
@@ -46,7 +46,7 @@ depend on C_Sn. The output is `CALC/AlSn_5FM_total.dat`.
 | D_Al, `--shift` | 0.0646 | 1.266 |
 | D_Al, database | 0.0646 | 1.266 |
 
-With the shift, D_Al matches the database at every temperature. D_Sn is within 2.6% of the
+With the shift, D_Al matches the database at every temperature. D_Sn is within 2.7% of the
 database's Arrhenius line from 500 to 900 K; the residual changes sign, so it comes from fitting a
 straight line to a slightly curved ln D, and the fitted D0 depends on the range (Manning's analytical
 f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run differs by under 0.4%.
@@ -79,10 +79,10 @@ That cluster is too small to be meaningful (drag ratio ≈ −1.66).
 
 | T (K) | kira 2 | kira 3 | kira 4 | kira 5 | kira 6 |
 |---|---|---|---|---|---|
-| 500 | 0.8157 | 0.8375 | 0.8427 | 0.8447 | 0.8455 |
-| 700 | 0.3649 | 0.4269 | 0.4423 | 0.4482 | 0.4506 |
-| 800 | 0.1213 | 0.1973 | 0.2165 | 0.2238 | 0.2269 |
-| 900 | −0.0984 | −0.0148 | 0.0068 | 0.0150 | 0.0184 |
+| 500 | 0.8160 | 0.8377 | 0.8430 | 0.8449 | 0.8458 |
+| 700 | 0.3654 | 0.4274 | 0.4429 | 0.4487 | 0.4511 |
+| 800 | 0.1219 | 0.1979 | 0.2171 | 0.2244 | 0.2274 |
+| 900 | −0.0978 | −0.0142 | 0.0073 | 0.0156 | 0.0190 |
 
 Kinetic range 4 is within 0.012 of kira 6 at every temperature. Below 800 K that is under 3%.
 Near 900 K, where the ratio is close to zero, the relative error is large and the
@@ -94,8 +94,8 @@ value still rises with kira. If the exact reversal temperature matters, use kira
 | T (K) | Manning | kira 2 | kira 3 | kira 4 |
 |---|---|---|---|---|
 | 500 | 0.00179 | 0.00181 | 0.00180 | 0.00179 |
-| 700 | 0.01468 | 0.01506 | 0.01478 | 0.01472 |
-| 900 | 0.04957 | 0.05159 | 0.05016 | 0.04981 |
+| 700 | 0.01468 | 0.01507 | 0.01479 | 0.01473 |
+| 900 | 0.04957 | 0.05161 | 0.05018 | 0.04983 |
 
 KineCluE converges to the analytical result, which confirms the jump assignments and prefactors.
 
