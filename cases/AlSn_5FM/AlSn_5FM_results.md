@@ -34,19 +34,20 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 ## Total coefficients and Sn diffusivity
 
 `total_lij.py` turns the pair coefficients into alloy coefficients for a given Sn fraction (default
-C_Sn = 1e-3), with C_v = exp(−Ef/kT) and Ef = 0.4847 eV. It works to first order in C_Sn. Only the pair
+C_Sn = 1e-3), with C_v = exp(Sf/k − Ef/kT), Ef = 0.6847 eV and Sf = ln 12 (the database's correction put
+into the vacancy formation free energy; see Parameters). It works to first order in C_Sn. Only the pair
 moves Sn, so the total L_vSn/L_SnSn equals the pair's drag ratio, and D_Sn = C_v·Z·l_SnSn does not
 depend on C_Sn. The output is `CALC/AlSn_5FM_total.dat`.
 
 | | D0 (cm²/s) | Q (eV) |
 |---|---|---|
-| D_Sn, DFT only | 0.0115 | 0.870 |
-| D_Sn, `--shift` (A_shift = 12, E_shift = 0.2 eV) | 0.138 | 1.070 |
+| D_Sn, uncorrected DFT (`--ef 0.4847 --sf 0`) | 0.0115 | 0.870 |
+| D_Sn, default (Ef = 0.6847 eV, Sf = ln 12) | 0.138 | 1.070 |
 | D_Sn, database | 0.139 | 1.070 |
-| D_Al, `--shift` | 0.0646 | 1.266 |
+| D_Al, default | 0.0646 | 1.266 |
 | D_Al, database | 0.0646 | 1.266 |
 
-With the shift, D_Al matches the database at every temperature. D_Sn is within 2.7% of the
+With the corrected formation free energy, D_Al matches the database at every temperature. D_Sn is within 2.7% of the
 database's Arrhenius line from 500 to 900 K; the residual changes sign, so it comes from fitting a
 straight line to a slightly curved ln D, and the fitted D0 depends on the range (Manning's analytical
 f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run differs by under 0.4%.
@@ -54,9 +55,15 @@ f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run diff
 The script also gives the vacancy diffusivity. In pure Al it is D_v = a²w0 (D0 = 0.00689 cm²/s,
 Q = 0.581 eV = E0). In the alloy, D_v = L_vv / C_v,tot, where C_v,tot = C_v[1 + C_Sn(Z − Z0)] counts
 the vacancies bound to Sn. Trapping by Sn slows the vacancies: at C_Sn = 1e-3, D_v is 29% of the
-pure-Al value at 500 K and 84% at 900 K (fit: D0 = 0.0232 cm²/s, Q = 0.683 eV). D_v doesn't depend
-on Ef, and `--shift` leaves it unchanged, because E_shift can't be split between vacancy formation
-and migration.
+pure-Al value at 500 K and 84% at 900 K (fit: D0 = 0.0232 cm²/s, Q = 0.683 eV). C_v cancels in D_v,
+so D_v doesn't depend on Ef or Sf.
+
+**Validity.** The formulas are linear in C_v·C_Sn: they assume few Sn atoms hold a vacancy. The last
+column of the output, C_v·(Z − Z0), is the ratio of bound to free Sn and should be ≪ 1. With the
+defaults it is 0.005 at 500 K, 0.09 at 700 K and 0.23 at 800 K (0.47 at 900 K), so above about 700 K
+D_Sn and the total Lij are overestimated by roughly a factor 1 + C_v·(Z − Z0). The database uses the
+same linear formula, so the comparison above is like for like. D_v is affected much less: for C_Sn = 4e-4 it
+is about 2% too low at 800 K and under 0.3% at 500 K. The script prints a note when the column exceeds 0.1.
 
 ## Vacancy diffusivity in Al–0.04 at.% Sn, 300–800 K
 
@@ -64,7 +71,7 @@ and migration.
 `python3 total_lij.py --name AlSn_5FM_lowT --input num_AlSn_lowT_input.txt --csn 4e-4` writes
 `CALC/AlSn_5FM_lowT_total.dat`.
 
-| T (K) | D_v, pure Al (m²/s) | D_v, Al–0.04 at.% Sn (m²/s) | alloy / pure | bound / free vacancies |
+| T (K) | D_v, pure Al (m²/s) | D_v, Al–0.04 at.% Sn (m²/s) | alloy / pure | C_Sn·(Z − Z0) |
 |---|---|---|---|---|
 | 300 | 1.18e-16 | 6.62e-18 | 0.056 | 49 |
 | 350 | 2.93e-15 | 3.20e-16 | 0.109 | 13 |
@@ -80,12 +87,14 @@ and migration.
 
 ![Vacancy diffusivity in pure Al and Al–0.04 at.% Sn](AlSn_5FM_Dv.png)
 
-Bound / free is C_Sn·(Z − Z0). Trapping on Sn cuts D_v to 5.6% of the pure-Al value at 300 K and 89% at
+C_Sn·(Z − Z0) is the excess of vacancies held by Sn relative to free ones (the Lomer term, since
+Z − Z0 = 12(S·e^(Eb/kT) − 1)). The exact bound / free vacancy ratio, 12·C_Sn·S·e^(Eb/kT) / (1 − 12·C_Sn),
+is slightly larger: 49.3 at 300 K, 1.28 at 500 K, 0.164 at 800 K. Trapping on Sn cuts D_v to 5.6% of the pure-Al value at 300 K and 89% at
 800 K. ln D_v is curved, so read values from the table; a straight fit over 300–800 K gives D0 = 0.0431
 cm²/s and Q = 0.700 eV (pure Al: 0.00689 cm²/s, 0.581 eV). D_v changes by under 0.1% between kinetic
 ranges 2 and 4 at 300, 500 and 800 K.
 
-D_v doesn't depend on Ef, but it does assume all the Sn is in solid solution. Sn solubility in Al
+D_v doesn't depend on Ef or Sf, but it does assume all the Sn is in solid solution. Sn solubility in Al
 drops steeply at low temperature, so near 300 K this alloy is likely supersaturated. For 0.04 wt.% Sn
 (≈ 0.009 at.%, `--csn 9.1e-5`) trapping is weaker: D_v / D_v,pure = 0.12 at 300 K, 0.49 at 400 K,
 0.79 at 500 K and 0.97 at 800 K.
@@ -155,11 +164,20 @@ by the starting configuration's S, so `make_5fm.py` writes ν·S for w1 and w2 a
 five rates then equal ν·exp(−E/kT) with the dataset values.
 
 KineCluE doesn't use the vacancy formation energy: its Lij are per Sn–vacancy pair. The sheet's Q
-values add Ef = 0.4847 eV (DFT, `Host Information` sheet) and an empirical shift E_shift = 0.2 eV
-that corrects self-diffusion toward experiment. Pure Al: Q = 0.4847 + 0.5814 + 0.2 = 1.266 eV.
-Sn: Ef + E2 − Eb = 0.547 eV, plus about 0.32 eV from the temperature dependence of f₂ (taken from
-the 500–900 K values above), gives about 0.87 eV. Adding E_shift gives the sheet's 1.070 eV. Neither
-Ef nor E_shift affects Lij ratios or f₂.
+values add Ef = 0.4847 eV (DFT, `Host Information` sheet) and an empirical correction A_shift = 12,
+E_shift = 0.2 eV that brings self-diffusion toward experiment. Pure Al: Q = 0.4847 + 0.5814 + 0.2 =
+1.266 eV. Sn: Ef + E2 − Eb = 0.547 eV, plus about 0.32 eV from the temperature dependence of f₂ (taken
+from the 500–900 K values above), gives about 0.87 eV. Adding E_shift gives the sheet's 1.070 eV.
+Neither Ef nor the correction affects Lij ratios or f₂.
+
+`total_lij.py` puts the correction into the vacancy formation free energy: Ef = 0.4847 + 0.2 = 0.6847 eV
+and Sf = ln 12 ≈ 2.48 k. The DFT Ef is about 0.19 eV below experiment (≈ 0.67 eV), while the DFT
+migration barrier (0.581 eV) is close to experiment, so the error sits mostly in formation. Every
+coefficient except D_v is proportional to C_v, so this gives exactly the database's corrected D0 and Q,
+and the same C_v enters the totals, D_Sn, D_Al and the validity check. The rest of the model (barriers,
+attempt frequencies, binding, lattice parameter) stays all-DFT. Sf = ln 12 is at the top of the
+experimental range for Al (about 0.7–2.4 k), so part of the factor 12 may belong to migration, and C_v
+(6×10⁻⁴ at 800 K) is probably on the high side.
 
 ## Files and how to run
 
@@ -172,7 +190,7 @@ Ef nor E_shift affects Lij ratios or f₂.
 | `CALC_kira6/` | Same model run to kinetic range 6 (`& KINETICRANGE 6 1`), for the convergence check |
 | `plot_results.py` | Makes `AlSn_5FM_results.png` from `CALC/` and `CALC_kira6/` |
 | `plot_dv.py` | Makes `AlSn_5FM_Dv.png` (D_v in pure Al and Al–0.04 at.% Sn) from `CALC/AlSn_5FM_lowT_total.dat` |
-| `total_lij.py` | Total Lij, D_Sn and D_Al from the pair coefficients (`python3 total_lij.py [CALC/] [--csn X] [--ef E] [--shift]`) |
+| `total_lij.py` | Total Lij, D_Sn and D_Al from the pair coefficients (`python3 total_lij.py [CALC/] [--csn X] [--ef E] [--sf S]`; defaults Ef = 0.6847 eV, Sf = ln 12) |
 | `num_AlSn_lowT_input.txt` | Numerical input for 300–800 K (output `AlSn_5FM_lowT`), used for the Al–0.04 at.% Sn vacancy diffusivity |
 
 To use other barriers or attempt frequencies, edit the parameter block at the top of `make_5fm.py` and run `./run.sh`
