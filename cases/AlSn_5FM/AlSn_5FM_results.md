@@ -33,9 +33,20 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 
 ## Checks
 
-**Thermodynamic range 1 vs full range:** a run with ThRa = KiRa = 4 (no reduction of variables)
-gives drag ratios identical to every printed digit. The reduction merges the 2NN, 3NN and 4NN
-dissociation jumps into a single w3/w4 frequency, which is the five-frequency model anyway.
+**Thermodynamic range:** all three settings below give identical Z, dissociation rate, Lij and drag
+ratios at every temperature. The convergence studies also agree on every kinetic range they share.
+Only the bookkeeping changes:
+
+| ThRa | Configuration classes | Jump classes | Notes |
+|---|---|---|---|
+| 4 (= KiRa, no reduction) | 41 | 158 | every shell and jump listed separately |
+| 1 (used here) | 3: 1NN, 2NN, dissociated | 7 | 1NN→3NN/4NN merged into one w3/w4 class; 1NN→2NN kept |
+| 0.75 | 2: 1NN, dissociated (2NN merged in) | 5 | one w3/w4 class for every 1NN dissociation |
+
+They agree because the strict five-frequency model gives 2NN and beyond no binding and w0 jumps, so
+extra classes only repeat the same values. ThRa 1 is kept so that a 2NN binding energy could be added
+without changing the setup. With ThRa 0.75 the convergence study also reports a kinetic range of 1.0a.
+That cluster is too small to be meaningful (drag ratio ≈ −1.66).
 
 **Kinetic range convergence** (drag ratio L_vs/L_ss; kira 5 and 6 from the kira-6 run in `CALC_kira6/`):
 
