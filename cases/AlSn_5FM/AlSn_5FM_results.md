@@ -7,6 +7,10 @@ barriers and attempt frequencies.
 All five barriers and attempt frequencies are the Al–Sn values from the Wu/Morgan DFT dilute-diffusion
 database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 
+The spreadsheet is from H. Wu, T. Mayeshiba & D. Morgan, "High-throughput ab-initio dilute solute
+diffusion database", Sci. Data 3, 160054 (2016), doi:10.1038/sdata.2016.54, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and is redistributed here unmodified.
+
 ## Results (kinetic range 4, thermodynamic range 1)
 
 | T (K) | L_vs/L_ss | Solute correlation f₂ |
