@@ -1,14 +1,15 @@
 """Total Onsager coefficients and Sn diffusivity in dilute Al-Sn from KineCluE's pair coefficients.
 
-Usage:  python3 total_lij.py [CALC_DIR] [--input FILE] [--csn X] [--ef E] [--sf S] [--shift]
+Usage:  python3 total_lij.py [CALC_DIR] [--input FILE] [--name NAME] [--csn X] [--ef E] [--sf S] [--shift]
   CALC_DIR  KineCluE output directory (default CALC/)
   --input   numerical input the run used, for the lattice parameter (default num_AlSn_input.txt; the copy
             KineCluE leaves in CALC_DIR is not refreshed on reruns)
+  --name    KineCluE output name (& OUTPUT) to read (default AlSn_5FM)
   --csn     Sn atomic fraction (default 1e-3)
   --ef      vacancy formation energy, eV (default 0.4847, DFT value from the database's Host Information sheet)
   --sf      vacancy formation entropy, kB (default 0)
   --shift   apply the database's self-diffusion correction (A_shift = 12, E_shift = 0.2 eV) to every coefficient
-Writes CALC_DIR/AlSn_5FM_total.dat.
+Reads CALC_DIR/NAME_0.dat and writes CALC_DIR/NAME_total.dat.
 
 KineCluE's cluster coefficients l_ij (m2/s) are for one pair, averaged over the Z configurations within
 the kinetic range, so the pair contributes C_pair * l_ij with C_pair = C_v * C_Sn * Z (local
@@ -33,6 +34,7 @@ A_SHIFT, E_SHIFT = 12, 0.2  # Al row of the database's Host Information sheet
 p = argparse.ArgumentParser()
 p.add_argument('calc', nargs='?', default='CALC/')
 p.add_argument('--input', default='num_AlSn_input.txt')
+p.add_argument('--name', default='AlSn_5FM')
 p.add_argument('--csn', type=float, default=1e-3)
 p.add_argument('--ef', type=float, default=0.4847)
 p.add_argument('--sf', type=float, default=0.0)
@@ -45,7 +47,7 @@ alat = next(float(l.split()[2]) for l in open(args.input) if l.startswith('& LAT
 nu0, e0 = next((float(l.split()[1]), float(l.split()[2])) for l in open(calc + 'jump_frequencies.txt')
                if l.rstrip().endswith('# w0'))
 
-d = np.loadtxt(calc + 'AlSn_5FM_0.dat', ndmin=2)
+d = np.loadtxt(calc + args.name + '_0.dat', ndmin=2)
 T, Z, Z0, l_vv, l_vs, l_ss = d[:, 0], d[:, 3], d[:, 4], d[:, 7], d[:, 8], d[:, 9]
 
 cv = np.exp(args.sf - args.ef / (KB * T))
@@ -61,7 +63,7 @@ if args.shift:
     corr = A_SHIFT * np.exp(-E_SHIFT / (KB * T))
     L_vv, L_vs, L_ss, D_sn, D_al = (x * corr for x in (L_vv, L_vs, L_ss, D_sn, D_al))
 
-out = calc + 'AlSn_5FM_total.dat'
+out = calc + args.name + '_total.dat'
 cols = ['1) T [K]', '2) C_v_pure', '3) Ltot_vv', '4) Ltot_vSn', '5) Ltot_SnSn', '6) Ltot_vSn/Ltot_SnSn',
         '7) D_Sn [m2/s]', '8) D_Al [m2/s]', '9) D_v_pure [m2/s]', '10) D_v_alloy [m2/s]']
 hdr = ('Dilute Al-Sn, C_Sn = {:g}, Ef = {:g} eV, Sf = {:g} kB, shift = {} (applies to columns 3-8 only)\n'

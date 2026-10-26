@@ -58,6 +58,36 @@ pure-Al value at 500 K and 84% at 900 K (fit: D0 = 0.0232 cm²/s, Q = 0.683 eV).
 on Ef, and `--shift` leaves it unchanged, because E_shift can't be split between vacancy formation
 and migration.
 
+## Vacancy diffusivity in Al–0.04 at.% Sn, 300–800 K
+
+`num_AlSn_lowT_input.txt` reruns the numerical stage for 300–800 K (25 K steps) with the same model, and
+`python3 total_lij.py --name AlSn_5FM_lowT --input num_AlSn_lowT_input.txt --csn 4e-4` writes
+`CALC/AlSn_5FM_lowT_total.dat`.
+
+| T (K) | D_v, pure Al (m²/s) | D_v, Al–0.04 at.% Sn (m²/s) | alloy / pure | bound / free vacancies |
+|---|---|---|---|---|
+| 300 | 1.18e-16 | 6.62e-18 | 0.056 | 49 |
+| 350 | 2.93e-15 | 3.20e-16 | 0.109 | 13 |
+| 400 | 3.26e-14 | 6.75e-15 | 0.207 | 5.0 |
+| 450 | 2.12e-13 | 7.21e-14 | 0.340 | 2.3 |
+| 500 | 9.50e-13 | 4.55e-13 | 0.479 | 1.3 |
+| 550 | 3.24e-12 | 1.95e-12 | 0.601 | 0.77 |
+| 600 | 9.01e-12 | 6.28e-12 | 0.697 | 0.51 |
+| 650 | 2.14e-11 | 1.65e-11 | 0.769 | 0.35 |
+| 700 | 4.49e-11 | 3.69e-11 | 0.822 | 0.26 |
+| 750 | 8.54e-11 | 7.35e-11 | 0.861 | 0.20 |
+| 800 | 1.50e-10 | 1.33e-10 | 0.889 | 0.16 |
+
+Bound / free is C_Sn·(Z − Z0). Trapping on Sn cuts D_v to 5.6% of the pure-Al value at 300 K and 89% at
+800 K. ln D_v is curved, so read values from the table; a straight fit over 300–800 K gives D0 = 0.0431
+cm²/s and Q = 0.700 eV (pure Al: 0.00689 cm²/s, 0.581 eV). D_v changes by under 0.1% between kinetic
+ranges 2 and 4 at 300, 500 and 800 K.
+
+D_v doesn't depend on Ef, but it does assume all the Sn is in solid solution. Sn solubility in Al
+drops steeply at low temperature, so near 300 K this alloy is likely supersaturated. For 0.04 wt.% Sn
+(≈ 0.009 at.%, `--csn 9.1e-5`) trapping is weaker: D_v / D_v,pure = 0.12 at 300 K, 0.49 at 400 K,
+0.79 at 500 K and 0.97 at 800 K.
+
 ## Checks
 
 **Thermodynamic range:** all three settings below give identical Z, dissociation rate, Lij and drag
@@ -136,10 +166,11 @@ Ef nor E_shift affects Lij ratios or f₂.
 | `main_AlSn_input.txt` | Analytical input: fcc lattice, vacancy + Sn, kinetic range 4, thermodynamic range 1 |
 | `num_AlSn_input.txt` | Numerical input: 500–900 K, lattice parameter, drag-ratio output |
 | `make_5fm.py` | Assigns each of KineCluE's jump classes to w0–w4 by its start and end configurations, and writes the energies into `CALC/configurations.txt` and `CALC/jump_frequencies.txt` |
-| `run.sh` | Runs analytical stage → `make_5fm.py` → numerical stage |
+| `run.sh` | Runs analytical stage → `make_5fm.py` → numerical stage (500–900 K, then 300–800 K) |
 | `CALC_kira6/` | Same model run to kinetic range 6 (`& KINETICRANGE 6 1`), for the convergence check |
 | `plot_results.py` | Makes `AlSn_5FM_results.png` from `CALC/` and `CALC_kira6/` |
 | `total_lij.py` | Total Lij, D_Sn and D_Al from the pair coefficients (`python3 total_lij.py [CALC/] [--csn X] [--ef E] [--shift]`) |
+| `num_AlSn_lowT_input.txt` | Numerical input for 300–800 K (output `AlSn_5FM_lowT`), used for the Al–0.04 at.% Sn vacancy diffusivity |
 
 To use other barriers or attempt frequencies, edit the parameter block at the top of `make_5fm.py` and run `./run.sh`
 (about 10 s).
