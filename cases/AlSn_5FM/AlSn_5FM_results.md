@@ -95,9 +95,12 @@ S = ν4/ν3 = 1.1065. Detailed balance between w3 and w4 needs it. KineCluE divi
 by the starting configuration's S, so `make_5fm.py` writes ν·S for w1 and w2 and ν4 for w3/w4. All
 five rates then equal ν·exp(−E/kT) with the dataset values.
 
-The database's own Q for Sn (1.070 eV) is about 0.2 eV above what these frequencies give with the
-sheet's vacancy formation energy (0.865 eV). Pure Al shows the same offset (1.266 vs 1.066 eV), so
-the database seems to use a different formation energy for Q. It doesn't affect Lij ratios or f₂.
+KineCluE doesn't use the vacancy formation energy: its Lij are per Sn–vacancy pair. The sheet's Q
+values add Ef = 0.4847 eV (DFT, `Host Information` sheet) and an empirical shift E_shift = 0.2 eV
+that corrects self-diffusion toward experiment. Pure Al: Q = 0.4847 + 0.5814 + 0.2 = 1.266 eV.
+Sn: Ef + E2 − Eb = 0.547 eV, plus about 0.32 eV from the temperature dependence of f₂ (taken from
+the 500–900 K values above), gives about 0.87 eV. Adding E_shift gives the sheet's 1.070 eV. Neither
+Ef nor E_shift affects Lij ratios or f₂.
 
 ## Files and how to run
 
