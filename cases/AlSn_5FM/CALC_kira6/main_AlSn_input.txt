@@ -1,0 +1,21 @@
+Analytical input: Sn solute + vacancy pair in fcc Al (five-frequency model).
+Lattice vectors are in units of the cubic lattice parameter a (given in the numerical input).
+
+& CRYSTAL fcc
+0.5 0.5 0.0
+0.5 0.0 0.5
+0.0 0.5 0.5
+& KINETICRANGE 6 1 # kinetic range 6a (convergence check); thermodynamic range 1a
+& KIRALOOP # store equations so kineclue_num can test convergence vs kinetic range
+& UNIQUEPOS 1
+s 0 0 0
+& SPECIES 2
+1 1 vacancy
+1 1 Sn
+& JUMPMECH
+%% 2 vacancy_jump
+s 1 0 0 0 > 1 1 0 0 # vacancy jumps to a 1NN site
+s 0 1 0 0 > 0 0 0 0 # that site is occupied by Al
+%% 2 solute_jump
+s 1 0 0 0 > 1 1 0 0 # vacancy jumps to a 1NN site...
+s 2 1 0 0 > 2 0 0 0 # ...occupied by Sn (vacancy-Sn exchange)

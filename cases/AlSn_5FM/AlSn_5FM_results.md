@@ -37,7 +37,7 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 gives drag ratios identical to every printed digit. The reduction merges the 2NN, 3NN and 4NN
 dissociation jumps into a single w3/w4 frequency, which is the five-frequency model anyway.
 
-**Kinetic range convergence** (drag ratio L_vs/L_ss; kira 5 and 6 from a separate kira-6 run):
+**Kinetic range convergence** (drag ratio L_vs/L_ss; kira 5 and 6 from the kira-6 run in `CALC_kira6/`):
 
 | T (K) | kira 2 | kira 3 | kira 4 | kira 5 | kira 6 |
 |---|---|---|---|---|---|
@@ -96,6 +96,8 @@ the database seems to use a different formation energy for Q. It doesn't affect 
 | `num_AlSn_input.txt` | Numerical input: 500–900 K, lattice parameter, drag-ratio output |
 | `make_5fm.py` | Assigns each of KineCluE's jump classes to w0–w4 by its start and end configurations, and writes the energies into `CALC/configurations.txt` and `CALC/jump_frequencies.txt` |
 | `run.sh` | Runs analytical stage → `make_5fm.py` → numerical stage |
+| `CALC_kira6/` | Same model run to kinetic range 6 (`& KINETICRANGE 6 1`), for the convergence check |
+| `plot_results.py` | Makes `AlSn_5FM_results.png` from `CALC/` and `CALC_kira6/` |
 
 To use other barriers or attempt frequencies, edit the parameter block at the top of `make_5fm.py` and run `./run.sh`
 (about 10 s).
