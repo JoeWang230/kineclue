@@ -141,6 +141,15 @@ def numrun(myinput: str, stream_log: bool=True):
         precision = int(float(input_dataset['precision'][0]))  # user
         mp.mp.dps = precision
         logger.info("!! Numerical precision is set to {} digits".format(mp.mp.dps))
+        # Klambda holds jump-vector projections as 15-digit floats (e.g. 1.41421356237309 for sqrt(2)), while L0 holds
+        # exact integers; L = L0 + Klambda.V then cancels only to ~1e-16 whatever the precision. Restore exact forms.
+        exact = {}
+        for f in set().union(*[sym.sympify(x).atoms(sym.Float) for x in Klambda.flat]):
+            g = sym.nsimplify(f, [sym.sqrt(2), sym.sqrt(3), sym.sqrt(5), sym.sqrt(6)])
+            if abs(float(g) - float(f)) <= 1e-13 * abs(float(f)):
+                exact[f] = g
+        Klambda = np.vectorize(lambda x: sym.sympify(x).xreplace(exact), otypes=[object])(Klambda)
+        logger.info("!! Klambda floats replaced by exact values: {}".format({str(k): str(v) for k, v in exact.items()}))
     else:
         precision = 15
 
