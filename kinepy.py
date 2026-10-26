@@ -1629,8 +1629,11 @@ def convergence_analysis(kiraloop: list, maxkira: dict, Wnum, Cnum, z, z0, L0, p
             for direction in range(ndir):
                 Lij0[direction] = float(JP/z2)*(np.array(L02[direction], dtype=float))
 
+        # Skip directions with zero transport; compare relative to the largest Lij because absolute
+        # values (m2/s) can fall below tol at low temperature
+        refscale = max(np.max(np.fabs(refLij[d])) for d in range(ndir))
         for direction in range(ndir):
-            if not are_equal_arrays(A=refLij[direction], B=0*refLij[direction]):
+            if refscale > 0 and not are_equal_arrays(A=refLij[direction]/refscale, B=0*refLij[direction]):
                 with open(dir + 'S{:.4f}_T{:.0f}_D{:.0f}.dat'.format(strain*100, temp, direction), 'a') as output:
                     output.writelines("{:^20.3f} {:^9.1f} {:^+12.6f} {:^15.6E} {:^15.1f}".format(a, temp, strain*100, float(z2), float(z02)))
                     for s1 in range(nsp):
