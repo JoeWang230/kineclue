@@ -40,15 +40,16 @@ depend on C_Sn. The output is `CALC/AlSn_5FM_total.dat`.
 
 | | D0 (cm²/s) | Q (eV) |
 |---|---|---|
-| D_Sn, DFT only | 0.0116 | 0.870 |
-| D_Sn, `--shift` (A_shift = 12, E_shift = 0.2 eV) | 0.139 | 1.070 |
+| D_Sn, DFT only | 0.0115 | 0.870 |
+| D_Sn, `--shift` (A_shift = 12, E_shift = 0.2 eV) | 0.138 | 1.070 |
 | D_Sn, database | 0.139 | 1.070 |
-| D_Al, `--shift` | 0.0650 | 1.266 |
+| D_Al, `--shift` | 0.0646 | 1.266 |
 | D_Al, database | 0.0646 | 1.266 |
 
-With the shift, the script reproduces the database's D0 and Q for both Sn and Al. The 0.6% gap in
-D0(Al) comes from the lattice parameter (4.05 Å here, 4.039 Å in the database). D_Sn from the kira-6
-run differs by under 0.4%.
+With the shift, D_Al matches the database at every temperature. D_Sn is within 2.6% of the
+database's Arrhenius line from 500 to 900 K; the residual changes sign, so it comes from fitting a
+straight line to a slightly curved ln D, and the fitted D0 depends on the range (Manning's analytical
+f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run differs by under 0.4%.
 
 ## Checks
 
@@ -106,7 +107,7 @@ makes that check relative to the largest Lij. The fixed output matches a rerun i
 | w3 dissociation 1NN → 2NN/3NN/4NN | 0.60063 | 3.8920 |
 | w4 association | 0.36456 | 4.3066 |
 
-Lattice parameter 4.05 Å (experimental Al). Sn–V binding at 1NN is Eb = E3 − E4 = 0.236 eV, zero
+Lattice parameter 4.0391 Å (the database's DFT value). Sn–V binding at 1NN is Eb = E3 − E4 = 0.236 eV, zero
 beyond 1NN. Every jump not touching the 1NN shell is w0, as in the strict five-frequency model.
 
 The attempt frequencies differ, so the 1NN configuration carries an entropy prefactor

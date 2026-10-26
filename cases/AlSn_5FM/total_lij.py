@@ -1,7 +1,9 @@
 """Total Onsager coefficients and Sn diffusivity in dilute Al-Sn from KineCluE's pair coefficients.
 
-Usage:  python3 total_lij.py [CALC_DIR] [--csn X] [--ef E] [--sf S] [--shift]
+Usage:  python3 total_lij.py [CALC_DIR] [--input FILE] [--csn X] [--ef E] [--sf S] [--shift]
   CALC_DIR  KineCluE output directory (default CALC/)
+  --input   numerical input the run used, for the lattice parameter (default num_AlSn_input.txt; the copy
+            KineCluE leaves in CALC_DIR is not refreshed on reruns)
   --csn     Sn atomic fraction (default 1e-3)
   --ef      vacancy formation energy, eV (default 0.4847, DFT value from the database's Host Information sheet)
   --sf      vacancy formation entropy, kB (default 0)
@@ -27,6 +29,7 @@ A_SHIFT, E_SHIFT = 12, 0.2  # Al row of the database's Host Information sheet
 
 p = argparse.ArgumentParser()
 p.add_argument('calc', nargs='?', default='CALC/')
+p.add_argument('--input', default='num_AlSn_input.txt')
 p.add_argument('--csn', type=float, default=1e-3)
 p.add_argument('--ef', type=float, default=0.4847)
 p.add_argument('--sf', type=float, default=0.0)
@@ -35,7 +38,7 @@ args = p.parse_args()
 calc = args.calc.rstrip('/') + '/'
 
 # Lattice parameter (Angstrom) from the numerical input, w0 prefactor (THz) and barrier (eV) from the jump file
-alat = next(float(l.split()[2]) for l in open(calc + 'num_AlSn_input.txt') if l.startswith('& LATTPARAM')) * 1e-10
+alat = next(float(l.split()[2]) for l in open(args.input) if l.startswith('& LATTPARAM')) * 1e-10
 nu0, e0 = next((float(l.split()[1]), float(l.split()[2])) for l in open(calc + 'jump_frequencies.txt')
                if l.rstrip().endswith('# w0'))
 
