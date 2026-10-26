@@ -62,12 +62,15 @@ if args.shift:
     L_vv, L_vs, L_ss, D_sn, D_al = (x * corr for x in (L_vv, L_vs, L_ss, D_sn, D_al))
 
 out = calc + 'AlSn_5FM_total.dat'
-hdr = ('C_Sn = {:g}, Ef = {:g} eV, Sf = {:g} kB, shift = {}; L in m2/s (L*kT per site), D in m2/s\n'
-       '{:>7s}' + ' {:>12s}' * 9).format(
-    args.csn, args.ef, args.sf, args.shift, 'T [K]', 'C_v', 'L_vv', 'L_vSn', 'L_SnSn', 'L_vSn/L_SnSn', 'D_Sn', 'D_Al',
-    'D_v(pure)', 'D_v(alloy)')
+cols = ['1) T [K]', '2) C_v_pure', '3) Ltot_vv', '4) Ltot_vSn', '5) Ltot_SnSn', '6) Ltot_vSn/Ltot_SnSn',
+        '7) D_Sn [m2/s]', '8) D_Al [m2/s]', '9) D_v_pure [m2/s]', '10) D_v_alloy [m2/s]']
+hdr = ('Dilute Al-Sn, C_Sn = {:g}, Ef = {:g} eV, Sf = {:g} kB, shift = {} (applies to columns 3-8 only)\n'
+       'C_v_pure: equilibrium vacancy fraction in pure Al, exp(Sf - Ef/kT)\n'
+       'Ltot_*: total (alloy) Onsager coefficients, not KineCluE cluster coefficients; L*kT per lattice site, m2/s\n'
+       'D_v_pure: vacancy diffusivity in pure Al; D_v_alloy: vacancy diffusivity including trapping on Sn\n'
+       ).format(args.csn, args.ef, args.sf, args.shift) + '{:>9s}'.format(cols[0]) + ''.join(' {:>21s}'.format(c) for c in cols[1:])
 np.savetxt(out, np.column_stack([T, cv, L_vv, L_vs, L_ss, L_vs / L_ss, D_sn, D_al, D_v0, D_v]), header=hdr,
-           fmt=['%9.1f'] + ['%12.4e'] * 9)
+           fmt=['%11.1f'] + ['%21.4e'] * 9)
 print(open(out).read().rstrip())
 
 # Arrhenius fits, to compare with the database's D0 and Q
