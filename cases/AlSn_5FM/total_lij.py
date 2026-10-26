@@ -1,0 +1,68 @@
+"""Total Onsager coefficients and Sn diffusivity in dilute Al-Sn from KineCluE's pair coefficients.
+
+Usage:  python3 total_lij.py [CALC_DIR] [--csn X] [--ef E] [--sf S] [--shift]
+  CALC_DIR  KineCluE output directory (default CALC/)
+  --csn     Sn atomic fraction (default 1e-3)
+  --ef      vacancy formation energy, eV (default 0.4847, DFT value from the database's Host Information sheet)
+  --sf      vacancy formation entropy, kB (default 0)
+  --shift   apply the database's self-diffusion correction (A_shift = 12, E_shift = 0.2 eV) to every coefficient
+Writes CALC_DIR/AlSn_5FM_total.dat.
+
+KineCluE's cluster coefficients l_ij (m2/s) are for one pair, averaged over the Z configurations within
+the kinetic range, so the pair contributes C_pair * l_ij with C_pair = C_v * C_Sn * Z (local
+equilibrium, C_v = exp(Sf/kB - Ef/kT)). The Z0 vacancy sites that the pair counts are removed from the
+free vacancies. To first order in C_Sn, in units of m2/s (L*kT per site):
+  L_vv   = C_v * [a^2 w0 + C_Sn * (Z l_vv - Z0 a^2 w0)]
+  L_vSn  = C_v * C_Sn * Z * l_vSn
+  L_SnSn = C_v * C_Sn * Z * l_SnSn
+  D_Sn   = L_SnSn / C_Sn = C_v * Z * l_SnSn
+The free-vacancy term a^2 w0 is the uncorrelated vacancy coefficient in fcc ((1/6) * 12 * (a^2/2) * w0).
+Species index 0 is the vacancy and 1 is Sn, as in main_AlSn_input.txt.
+"""
+import argparse
+import numpy as np
+
+KB = 1 / 11604.5221  # eV/K, as in kineclue_num.py
+A_SHIFT, E_SHIFT = 12, 0.2  # Al row of the database's Host Information sheet
+
+p = argparse.ArgumentParser()
+p.add_argument('calc', nargs='?', default='CALC/')
+p.add_argument('--csn', type=float, default=1e-3)
+p.add_argument('--ef', type=float, default=0.4847)
+p.add_argument('--sf', type=float, default=0.0)
+p.add_argument('--shift', action='store_true')
+args = p.parse_args()
+calc = args.calc.rstrip('/') + '/'
+
+# Lattice parameter (Angstrom) from the numerical input, w0 prefactor (THz) and barrier (eV) from the jump file
+alat = next(float(l.split()[2]) for l in open(calc + 'num_AlSn_input.txt') if l.startswith('& LATTPARAM')) * 1e-10
+nu0, e0 = next((float(l.split()[1]), float(l.split()[2])) for l in open(calc + 'jump_frequencies.txt')
+               if l.rstrip().endswith('# w0'))
+
+d = np.loadtxt(calc + 'AlSn_5FM_0.dat', ndmin=2)
+T, Z, Z0, l_vv, l_vs, l_ss = d[:, 0], d[:, 3], d[:, 4], d[:, 7], d[:, 8], d[:, 9]
+
+cv = np.exp(args.sf - args.ef / (KB * T))
+lv_free = alat**2 * nu0 * 1e12 * np.exp(-e0 / (KB * T))
+L_vv = cv * (lv_free + args.csn * (Z * l_vv - Z0 * lv_free))
+L_vs = cv * args.csn * Z * l_vs
+L_ss = cv * args.csn * Z * l_ss
+D_sn = cv * Z * l_ss
+D_al = cv * 0.7815 * lv_free  # pure-Al self-diffusion, fcc vacancy correlation factor f0 = 0.7815
+if args.shift:
+    corr = A_SHIFT * np.exp(-E_SHIFT / (KB * T))
+    L_vv, L_vs, L_ss, D_sn, D_al = (x * corr for x in (L_vv, L_vs, L_ss, D_sn, D_al))
+
+out = calc + 'AlSn_5FM_total.dat'
+hdr = ('C_Sn = {:g}, Ef = {:g} eV, Sf = {:g} kB, shift = {}; L in m2/s (L*kT per site), D in m2/s\n'
+       '{:>7s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s}').format(
+    args.csn, args.ef, args.sf, args.shift, 'T [K]', 'C_v', 'L_vv', 'L_vSn', 'L_SnSn', 'L_vSn/L_SnSn', 'D_Sn', 'D_Al')
+np.savetxt(out, np.column_stack([T, cv, L_vv, L_vs, L_ss, L_vs / L_ss, D_sn, D_al]), header=hdr,
+           fmt=['%9.1f'] + ['%12.4e'] * 7)
+print(open(out).read().rstrip())
+
+# Arrhenius fits, to compare with the database's D0 and Q
+for name, D in (('Sn', D_sn), ('Al', D_al)):
+    slope, icpt = np.polyfit(1 / (KB * T), np.log(D), 1)
+    print('D_{}: D0 = {:.4g} cm2/s, Q = {:.4f} eV'.format(name, np.exp(icpt) * 1e4, -slope))
+print('Wrote', out)

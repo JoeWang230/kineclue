@@ -31,6 +31,25 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
   Absolute values are per-cluster quantities and change with kinetic range, so use the ratios for
   physics.
 
+## Total coefficients and Sn diffusivity
+
+`total_lij.py` turns the pair coefficients into alloy coefficients for a given Sn fraction (default
+C_Sn = 1e-3), with C_v = exp(−Ef/kT) and Ef = 0.4847 eV. It works to first order in C_Sn. Only the pair
+moves Sn, so the total L_vSn/L_SnSn equals the pair's drag ratio, and D_Sn = C_v·Z·l_SnSn does not
+depend on C_Sn. The output is `CALC/AlSn_5FM_total.dat`.
+
+| | D0 (cm²/s) | Q (eV) |
+|---|---|---|
+| D_Sn, DFT only | 0.0116 | 0.870 |
+| D_Sn, `--shift` (A_shift = 12, E_shift = 0.2 eV) | 0.139 | 1.070 |
+| D_Sn, database | 0.139 | 1.070 |
+| D_Al, `--shift` | 0.0650 | 1.266 |
+| D_Al, database | 0.0646 | 1.266 |
+
+With the shift, the script reproduces the database's D0 and Q for both Sn and Al. The 0.6% gap in
+D0(Al) comes from the lattice parameter (4.05 Å here, 4.039 Å in the database). D_Sn from the kira-6
+run differs by under 0.4%.
+
 ## Checks
 
 **Thermodynamic range:** all three settings below give identical Z, dissociation rate, Lij and drag
@@ -112,6 +131,7 @@ Ef nor E_shift affects Lij ratios or f₂.
 | `run.sh` | Runs analytical stage → `make_5fm.py` → numerical stage |
 | `CALC_kira6/` | Same model run to kinetic range 6 (`& KINETICRANGE 6 1`), for the convergence check |
 | `plot_results.py` | Makes `AlSn_5FM_results.png` from `CALC/` and `CALC_kira6/` |
+| `total_lij.py` | Total Lij, D_Sn and D_Al from the pair coefficients (`python3 total_lij.py [CALC/] [--csn X] [--ef E] [--shift]`) |
 
 To use other barriers or attempt frequencies, edit the parameter block at the top of `make_5fm.py` and run `./run.sh`
 (about 10 s).
