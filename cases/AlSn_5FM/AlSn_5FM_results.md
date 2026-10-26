@@ -51,6 +51,13 @@ database's Arrhenius line from 500 to 900 K; the residual changes sign, so it co
 straight line to a slightly curved ln D, and the fitted D0 depends on the range (Manning's analytical
 f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run differs by under 0.4%.
 
+The script also gives the vacancy diffusivity. In pure Al it is D_v = a²w0 (D0 = 0.00689 cm²/s,
+Q = 0.581 eV = E0). In the alloy, D_v = L_vv / C_v,tot, where C_v,tot = C_v[1 + C_Sn(Z − Z0)] counts
+the vacancies bound to Sn. Trapping by Sn slows the vacancies: at C_Sn = 1e-3, D_v is 29% of the
+pure-Al value at 500 K and 84% at 900 K (fit: D0 = 0.0232 cm²/s, Q = 0.683 eV). D_v doesn't depend
+on Ef, and `--shift` leaves it unchanged, because E_shift can't be split between vacancy formation
+and migration.
+
 ## Checks
 
 **Thermodynamic range:** all three settings below give identical Z, dissociation rate, Lij and drag

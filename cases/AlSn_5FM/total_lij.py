@@ -18,7 +18,10 @@ free vacancies. To first order in C_Sn, in units of m2/s (L*kT per site):
   L_vSn  = C_v * C_Sn * Z * l_vSn
   L_SnSn = C_v * C_Sn * Z * l_SnSn
   D_Sn   = L_SnSn / C_Sn = C_v * Z * l_SnSn
-The free-vacancy term a^2 w0 is the uncorrelated vacancy coefficient in fcc ((1/6) * 12 * (a^2/2) * w0).
+  D_v    = L_vv / C_v_tot, with C_v_tot = C_v * [1 + C_Sn * (Z - Z0)] (free vacancies plus those bound to Sn)
+The free-vacancy term a^2 w0 is the uncorrelated vacancy coefficient in fcc ((1/6) * 12 * (a^2/2) * w0); it is
+also D_v in pure Al. D_v does not depend on Ef and is never shifted: E_shift corrects self-diffusion as a
+whole and cannot be split between vacancy formation and migration.
 Species index 0 is the vacancy and 1 is Sn, as in main_AlSn_input.txt.
 """
 import argparse
@@ -52,20 +55,23 @@ L_vs = cv * args.csn * Z * l_vs
 L_ss = cv * args.csn * Z * l_ss
 D_sn = cv * Z * l_ss
 D_al = cv * 0.7815 * lv_free  # pure-Al self-diffusion, fcc vacancy correlation factor f0 = 0.7815
+D_v0 = lv_free  # vacancy diffusivity in pure Al
+D_v = L_vv / (cv * (1 + args.csn * (Z - Z0)))  # vacancy diffusivity in the alloy, slowed by trapping on Sn
 if args.shift:
     corr = A_SHIFT * np.exp(-E_SHIFT / (KB * T))
     L_vv, L_vs, L_ss, D_sn, D_al = (x * corr for x in (L_vv, L_vs, L_ss, D_sn, D_al))
 
 out = calc + 'AlSn_5FM_total.dat'
 hdr = ('C_Sn = {:g}, Ef = {:g} eV, Sf = {:g} kB, shift = {}; L in m2/s (L*kT per site), D in m2/s\n'
-       '{:>7s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s} {:>12s}').format(
-    args.csn, args.ef, args.sf, args.shift, 'T [K]', 'C_v', 'L_vv', 'L_vSn', 'L_SnSn', 'L_vSn/L_SnSn', 'D_Sn', 'D_Al')
-np.savetxt(out, np.column_stack([T, cv, L_vv, L_vs, L_ss, L_vs / L_ss, D_sn, D_al]), header=hdr,
-           fmt=['%9.1f'] + ['%12.4e'] * 7)
+       '{:>7s}' + ' {:>12s}' * 9).format(
+    args.csn, args.ef, args.sf, args.shift, 'T [K]', 'C_v', 'L_vv', 'L_vSn', 'L_SnSn', 'L_vSn/L_SnSn', 'D_Sn', 'D_Al',
+    'D_v(pure)', 'D_v(alloy)')
+np.savetxt(out, np.column_stack([T, cv, L_vv, L_vs, L_ss, L_vs / L_ss, D_sn, D_al, D_v0, D_v]), header=hdr,
+           fmt=['%9.1f'] + ['%12.4e'] * 9)
 print(open(out).read().rstrip())
 
 # Arrhenius fits, to compare with the database's D0 and Q
-for name, D in (('Sn', D_sn), ('Al', D_al)):
+for name, D in (('Sn', D_sn), ('Al', D_al), ('v(pure)', D_v0), ('v(alloy)', D_v)):
     slope, icpt = np.polyfit(1 / (KB * T), np.log(D), 1)
     print('D_{}: D0 = {:.4g} cm2/s, Q = {:.4f} eV'.format(name, np.exp(icpt) * 1e4, -slope))
 print('Wrote', out)
