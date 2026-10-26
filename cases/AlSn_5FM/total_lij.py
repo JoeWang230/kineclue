@@ -31,7 +31,8 @@ uncorrected DFT.
 
 Validity: the formulas are linear in C_v * C_Sn, i.e. they assume few Sn atoms hold a vacancy. Column 11,
 C_v * (Z - Z0), is the ratio of bound to free Sn; it should be << 1 (with the defaults, 0.005 at 500 K,
-0.09 at 700 K, 0.23 at 800 K). Where it is not, D_Sn and the Ltot are overestimated by about a factor 1 + C_v * (Z - Z0).
+0.09 at 700 K, 0.23 at 800 K). Where it is not, D_Sn, Ltot_vSn and Ltot_SnSn are overestimated by about a factor
+1 + C_v * (Z - Z0); Ltot_vv, dominated by free vacancies, much less.
 Species index 0 is the vacancy and 1 is Sn, as in main_AlSn_input.txt.
 """
 import argparse
@@ -87,6 +88,7 @@ for name, D in (('Sn', D_sn), ('Al', D_al), ('v(pure)', D_v0), ('v(alloy)', D_v)
     slope, icpt = np.polyfit(1 / (KB * T), np.log(D), 1)
     print('D_{}: D0 = {:.4g} cm2/s, Q = {:.4f} eV'.format(name, np.exp(icpt) * 1e4, -slope))
 if sat.max() > 0.1:
-    print('Note: C_v*(Z-Z0) > 0.1 from {:.0f} K up; D_Sn and Ltot there are overestimated (see header)'.format(
+    print('Note: C_v*(Z-Z0) > 0.1 from {:.0f} K up; D_Sn, Ltot_vSn and Ltot_SnSn there are overestimated'
+          ' (see total_lij.py docstring)'.format(
         T[sat > 0.1].min()))
 print('Wrote', out)

@@ -1,7 +1,8 @@
 # Sn–vacancy pair in fcc Al: five-frequency model with KineCluE
 
 Transport coefficients of a Sn solute–vacancy pair in fcc aluminium, computed with KineCluE using the
-Lidiard–LeClaire five-frequency model, 500–900 K, with DFT barriers and attempt frequencies.
+Lidiard–LeClaire five-frequency model, 500–900 K (and 300–800 K for the vacancy diffusivity), with DFT
+barriers and attempt frequencies.
 
 All five barriers and attempt frequencies are the Al–Sn values from the Wu/Morgan DFT dilute-diffusion
 database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
@@ -21,9 +22,9 @@ database (`../DFT_solute_diffusivity_all.xlsx`, sheet `Al-X`).
 | 900 | 0.007 | 0.0498 |
 
 - **Vacancy drag:** L_vs/L_ss is positive over the whole range, so vacancies drag Sn along with them.
-  But it falls steeply with temperature and is close to zero at 900 K. Extrapolating, drag reverses
-  at about 905–910 K (≈ 0.97 T_m, with T_m = 933 K), so in practice it holds over the whole
-  solid-state range.
+  But it falls steeply with temperature and is close to zero at 900 K. Extrapolating from 850 and
+  900 K, drag reverses at about 904 K (909 K at kinetic range 6; ≈ 0.97 T_m, with T_m = 933 K), so in
+  practice it holds over the whole solid-state range.
 - **Correlation:** f₂ is very small (0.002–0.05) because Sn–vacancy exchange (w2 = 0.30 eV) is far
   faster than rotation (w1 = 0.80 eV) and dissociation (w3 = 0.60 eV): w2/w1 ≈ 2000 at 700 K. The
   vacancy swaps back and forth with Sn many times before it leaves, and most of those swaps cancel.
@@ -47,8 +48,8 @@ depend on C_Sn. The output is `CALC/AlSn_5FM_total.dat`.
 | D_Al, default | 0.0646 | 1.266 |
 | D_Al, database | 0.0646 | 1.266 |
 
-With the corrected formation free energy, D_Al matches the database at every temperature. D_Sn is within 2.7% of the
-database's Arrhenius line from 500 to 900 K; the residual changes sign, so it comes from fitting a
+With the corrected formation free energy, D_Al matches the database to within 0.06% at every
+temperature. D_Sn is within 2.7% of the database's Arrhenius line from 500 to 900 K; the residual changes sign, so it comes from fitting a
 straight line to a slightly curved ln D, and the fitted D0 depends on the range (Manning's analytical
 f₂ fitted over 500–900 K gives 0.1375 cm²/s). D_Sn from the kira-6 run differs by under 0.4%.
 
@@ -61,7 +62,8 @@ so D_v doesn't depend on Ef or Sf.
 **Validity.** The formulas are linear in C_v·C_Sn: they assume few Sn atoms hold a vacancy. The last
 column of the output, C_v·(Z − Z0), is the ratio of bound to free Sn and should be ≪ 1. With the
 defaults it is 0.005 at 500 K, 0.09 at 700 K and 0.23 at 800 K (0.47 at 900 K), so above about 700 K
-D_Sn and the total Lij are overestimated by roughly a factor 1 + C_v·(Z − Z0). The database uses the
+D_Sn, L_vSn and L_SnSn are overestimated by roughly a factor 1 + C_v·(Z − Z0); L_vv, dominated by
+free vacancies, much less. The database uses the
 same linear formula, so the comparison above is like for like. D_v is affected much less: for C_Sn = 4e-4 it
 is about 2% too low at 800 K and under 0.3% at 500 K. The script prints a note when the column exceeds 0.1.
 
@@ -74,13 +76,13 @@ is about 2% too low at 800 K and under 0.3% at 500 K. The script prints a note w
 | T (K) | D_v, pure Al (m²/s) | D_v, Al–0.04 at.% Sn (m²/s) | alloy / pure | C_Sn·(Z − Z0) |
 |---|---|---|---|---|
 | 300 | 1.18e-16 | 6.62e-18 | 0.056 | 49 |
-| 350 | 2.93e-15 | 3.20e-16 | 0.109 | 13 |
+| 350 | 2.92e-15 | 3.20e-16 | 0.109 | 13 |
 | 400 | 3.26e-14 | 6.75e-15 | 0.207 | 5.0 |
 | 450 | 2.12e-13 | 7.21e-14 | 0.340 | 2.3 |
 | 500 | 9.50e-13 | 4.55e-13 | 0.479 | 1.3 |
 | 550 | 3.24e-12 | 1.95e-12 | 0.601 | 0.77 |
 | 600 | 9.01e-12 | 6.28e-12 | 0.697 | 0.51 |
-| 650 | 2.14e-11 | 1.65e-11 | 0.769 | 0.35 |
+| 650 | 2.14e-11 | 1.64e-11 | 0.769 | 0.35 |
 | 700 | 4.49e-11 | 3.69e-11 | 0.822 | 0.26 |
 | 750 | 8.54e-11 | 7.35e-11 | 0.861 | 0.20 |
 | 800 | 1.50e-10 | 1.33e-10 | 0.889 | 0.16 |
@@ -114,7 +116,7 @@ Only the bookkeeping changes:
 They agree because the strict five-frequency model gives 2NN and beyond no binding and w0 jumps, so
 extra classes only repeat the same values. ThRa 1 is kept so that a 2NN binding energy could be added
 without changing the setup. With ThRa 0.75 the convergence study also reports a kinetic range of 1.0a.
-That cluster is too small to be meaningful (drag ratio ≈ −1.66).
+That cluster is too small to be meaningful (drag ratio −1.64 to −1.66).
 
 **Kinetic range convergence** (drag ratio L_vs/L_ss; kira 5 and 6 from the kira-6 run in `CALC_kira6/`):
 
